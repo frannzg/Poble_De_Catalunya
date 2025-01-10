@@ -1,3 +1,8 @@
+<head>
+<title>Pobles de Catalunya</title>
+
+<link rel="icon" href="{{ asset('favicon.png') }}" type="image/x-icon">
+</head>
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">

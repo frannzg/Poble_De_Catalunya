@@ -1,3 +1,8 @@
+<head>
+<title>Pobles de Catalunya</title>
+
+<link rel="icon" href="{{ asset('favicon.png') }}" type="image/x-icon">
+</head>
 <x-guest-layout>
     <x-authentication-card>
         <x-slot name="logo">
@@ -7,6 +12,7 @@
                 </button>    
                 <p style="font-family: fantasy; font-size: 50px; color: white;">ERROR 500 </p>
                 <p style="font-family: fantasy; font-size: 50px; color: white;">NO POTS DONAR D'ALTA A UN USUARI, SIUSPLAU CONSULTA AMB UN ADMINISTRADOR !</p>
+                <p style="font-family: fantasy; font-size: 50px; color: white;">CLICKA A LA ICONA PER TORNA</p>
             </div>
         </x-slot>
 
