@@ -8,7 +8,9 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/poble', [PobleController::class, 'index']);  // Obtener todos los pueblos
-Route::get('/poble/{id}', [PobleController::class, 'show']);  // Obtener un pueblo específico por ID
-Route::get('/obtenir_municipis', [PobleController::class, 'obtenirMunicipis']);
+Route::get('/poble', [PobleController::class, 'index']);  
+Route::get('/poble/{id}', [PobleController::class, 'show']);  
+Route::get('/obtenirPobles', [PobleController::class, 'obtenirPobles']);
+Route::get('/actualizarFotosMunicipios', [PobleController::class, 'actualizarFotosMunicipios']);
+
 

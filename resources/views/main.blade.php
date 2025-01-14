@@ -16,70 +16,89 @@
         <title>Pobles de Catalunya</title>
     </head>
 
-    <body class="bg-gray-50 text-black/50">
+    <body>
         <!-- Menú superior -->
         <header class="bg-white border-b border-gray-200">
             <div class="container mx-auto flex justify-between items-center p-4">
-                <div class="text-xl font-bold">Pobles de Catalunya</div>
+                <div class="text-xl font-bold"></div>
                 <div class="flex space-x-4">
                     @if (Route::has('login'))
-                        <nav>
-                            @auth
-                                <a href="{{ url('/dashboard') }}" class="text-black hover:text-gray-700">Dashboard</a>
-                            @else
-                                <a href="{{ route('login') }}" class="text-black hover:text-gray-700">Log in</a>
-                            @endauth
-                        </nav>
+                    <nav>
+                        @auth
+                        <a href="{{ url('/dashboard') }}" class="text-black hover:text-gray-700">Dashboard</a>
+                        @else
+                        <a href="{{ route('login') }}" class="text-black hover:text-gray-700">Log in</a>
+                        @endauth
+                    </nav>
                     @endif
                 </div>
             </div>
         </header>
 
-        <div class="p-6 lg:p-8 bg-white border-b border-gray-200">
-            <div>
-                <h1 style="text-align: center; font-family: auto; font-size: 40px;">Pobles de Catalunya</h1>
-                <h4 style="font-size: 18px; font-family: auto; text-align: left;">Clica sobre qualsevol comarca o província per veure els pobles que hi pertanyen.</h4>
+        <div>
+            <div class="container my-3">
+                <div>
+                    <h1 style="text-align: center; font-family: auto; font-size: 40px;">Pobles de Catalunya</h1>
+                    <p style="text-align: center; font-family: auto; font-size: 20px;">Clica sobre qualsevol comarca o província per veure els pobles que hi pertanyen.</p>
+                </div>
             </div>
 
-            <div style="display: flex; justify-content: center;">
-                <table id="myTable" style="text-align: center">
+            <div style="display: flex; justify-content: center; padding: 20px; width: 100%;">
+                <table id="myTable" style="text-align: center; width: 100%; border: 1px solid #ddd; border-collapse: collapse;">
                     <thead>
                         <tr>
                             <th>Nom</th>
-                            <th>Provincia</th>
                             <th>Comarca</th>
+                            <th>Provincia</th>
+                            <th>Accions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td>1</td>
-                            <td>1</td>
-                            <td>1</td>
+                            <td>Reus</td>
+                            <td>Baix Camp</td>
+                            <td>Tarragona</td>
+                            <td>
+                                <div class="flex flex-row items-center justify-center" style="column-gap: 0.6rem;">
+                                    <div>
+                                        <button id="editar_btn" onclick="editarMaterial('')">
+                                            <img src="{{ asset('build/assets/iconoVisualizar.png') }}" alt="Icono de editar" width="30" style="background-color:yellow; border-radius: 5px;">
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
-                            <td>2</td>
-                            <td>2</td>
-                            <td>2</td>
+                            <td>Alguaire</td>
+                            <td>Segrià</td>
+                            <td>Lleida</td>
+                            <td>
+                                <div class="flex flex-row items-center justify-center" style="column-gap: 0.6rem;">
+                                    <div>
+                                        <button id="editar_btn" onclick="editarMaterial('')">
+                                            <img src="{{ asset('build/assets/iconoVisualizar.png') }}" alt="Icono de editar" width="30" style="background-color:yellow; border-radius: 5px;">
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                         <tr>
-                            <td>3</td>
-                            <td>3</td>
-                            <td>3</td>
+                            <td>Sabadell</td>
+                            <td>Valles Occidental</td>
+                            <td>Barcelona</td>
+                            <td>
+                                <div class="flex flex-row items-center justify-center" style="column-gap: 0.6rem;">
+                                    <div>
+                                        <button id="editar_btn" onclick="editarMaterial('')">
+                                            <img src="{{ asset('build/assets/iconoVisualizar.png') }}" alt="Icono de editar" width="30" style="background-color:yellow; border-radius: 5px;">
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-
-            <div class="provincias">
-                <button onclick="mostrarPueblosPorProvincia('Barcelona')">Barcelona</button>
-                <button onclick="mostrarPueblosPorProvincia('Girona')">Girona</button>
-                <!-- Agregar más provincias -->
-            </div>
-
-            <div class="pueblos">
-                <!-- Aquí se mostrarán los pueblos filtrados -->
-            </div>
-
         </div>
     </body>
 
@@ -91,7 +110,7 @@
                 "paging": true, // Paginación
                 "searching": true, // Buscar
                 "ordering": true, // Ordenar
-                "info": true, // Información de la tabla
+                "info": false, // Información de la tabla
                 "responsive": true,
                 "language": {
                     "decimal": "",
@@ -117,17 +136,5 @@
                 }
             });
         });
-
-        function mostrarPueblosPorProvincia(provincia) {
-            fetch(`/api/pueblos?provincia=${provincia}`)
-                .then(response => response.json())
-                .then(data => {
-                    const pueblosDiv = document.querySelector('.pueblos');
-                    pueblosDiv.innerHTML = '';
-                    data.forEach(pueblo => {
-                        pueblosDiv.innerHTML += `<div>${pueblo.nombre}</div>`;
-                    });
-                });
-        }
     </script>
 </x-guest-layout>

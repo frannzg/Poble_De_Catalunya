@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('pobles', function (Blueprint $table) {
             $table->id();
@@ -18,19 +18,18 @@ return new class extends Migration
             $table->string('provincia');
             $table->text('descripcio')->nullable();
             $table->string('foto')->nullable();
-            $table->float('latitud')->nullable();
-            $table->float('longitud')->nullable();
-            $table->float('altitud')->nullable();
-            $table->float('superficie')->nullable();
+            $table->decimal('latitud', 10, 6)->nullable();
+            $table->decimal('longitud', 10, 6)->nullable();
+            $table->integer('altitud')->nullable();
+            $table->decimal('superficie', 8, 2)->nullable();
             $table->integer('poblacio')->nullable();
+            $table->string('codi');
+            $table->string('codiComarca');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('pobles');
     }

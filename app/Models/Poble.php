@@ -20,6 +20,8 @@ class Poble extends Model
         'altitud',
         'superficie',
         'poblacio',
+        'codi',
+        'codiComarca',
         
     ];
 }
