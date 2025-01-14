@@ -34,7 +34,7 @@ class PobleController extends Controller
     public function obtenirPobles()
     {
         // Ruta completa al fitxer CSV (ajusta aquesta ruta segons el teu entorn)
-        $path = 'C:\\Users\\Usuario.DESKTOP-F8NFSKL\\Desktop\\Poble_De_Catalunya\\public\\build\\assets\\mpiscatalunya.csv';
+        $path = 'C:\\Users\\fran1\\Desktop\\Poble_De_Catalunya\\public\\build\\assets\\mpiscatalunya.csv';
 
         // Comprovar si el fitxer existeix
         if (!file_exists($path)) {
@@ -111,41 +111,51 @@ class PobleController extends Controller
         return response()->json(['missatge' => 'Pobles guardats correctament']);
     }
 
-    public function actualizarFotosMunicipios()
+    public function actualizarDatosMunicipios()
     {
-        // Obtener todos los municipios de la base de datos
+        // Obtenir tots els municipis de la base de dades
         $pobles = Poble::all();
 
         foreach ($pobles as $poble) {
-            // Obtener el nombre del municipio
+            // Obtenir el nom del municipi
             $municipio = $poble->nom;
 
-            // URL del endpoint de la API de Wikipedia para obtener la imagen del municipio
-            $url = 'https://es.wikipedia.org/w/api.php?action=query&titles=' . urlencode($municipio) . '&prop=pageimages&format=json&pithumbsize=500';
+            // URL de l'endpoint de l'API de Wikipedia per obtenir la imatge principal i el contingut complet del municipi
+            $url = 'https://ca.wikipedia.org/w/api.php?action=query&titles=' . urlencode($municipio) . '&prop=pageimages|extracts&explaintext=true&format=json&pithumbsize=1000';
 
-            // Realizar la solicitud GET a la API
+            // Realitzar la sol·licitud GET a l'API
             $response = Http::get($url);
             $data = $response->json();
 
-            // Verificar si la respuesta contiene la imagen
+            // Verificar si la resposta conté dades de la pàgina
             if (isset($data['query']['pages']) && !empty($data['query']['pages'])) {
                 $page = reset($data['query']['pages']);
-                if (isset($page['thumbnail']['source'])) {
-                    $imageUrl = $page['thumbnail']['source'];
 
-                    // Almacenar la URL de la imagen en la base de datos
-                    $poble->foto = $imageUrl;
+                // Obtenir la URL de la imatge si està disponible
+                $imageUrl = $page['thumbnail']['source'] ?? null;
+
+                // Obtenir el contingut complet de la pàgina si està disponible
+                $extract = $page['extract'] ?? null;
+
+                // Actualitzar els camps a la base de dades si s'han obtingut dades
+                if ($imageUrl || $extract) {
+                    if ($imageUrl) {
+                        $poble->foto = $imageUrl;
+                    }
+                    if ($extract) {
+                        $poble->descripcio = $extract;
+                    }
                     $poble->save();
                 } else {
-                    // Manejar el caso en que no se encontró la imagen en Wikipedia
-                    // Puedes registrar el error o realizar alguna acción adicional
+                    // Gestionar el cas en què no s'han trobat dades adequades
+                    // Pots registrar l'error o realitzar alguna acció addicional
                 }
             } else {
-                // Manejar el caso en que no se encontró la página del municipio en Wikipedia
-                // Puedes registrar el error o realizar alguna acción adicional
+                // Gestionar el cas en què no s'ha trobat la pàgina del municipi a Wikipedia
+                // Pots registrar l'error o realitzar alguna acció addicional
             }
         }
 
-        return response()->json(['message' => 'Fotos de los municipios actualizadas en la base de datos.']);
+        return response()->json(['message' => 'Dades dels municipis actualitzades a la base de dades.']);
     }
 }
