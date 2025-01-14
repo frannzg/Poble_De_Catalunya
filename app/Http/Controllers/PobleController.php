@@ -112,51 +112,40 @@ class PobleController extends Controller
     }
 
     public function actualizarFotosMunicipios()
-{
-    // Obtener todos los municipios de la base de datos
-    $pobles = Poble::all();
+    {
+        // Obtener todos los municipios de la base de datos
+        $pobles = Poble::all();
 
-    foreach ($pobles as $poble) {
-        // Obtener el nombre del municipio
-        $municipio = $poble->nom;
+        foreach ($pobles as $poble) {
+            // Obtener el nombre del municipio
+            $municipio = $poble->nom;
 
-        // URL del endpoint de la API de Wikipedia para obtener la imagen del municipio
-        $url = 'https://es.wikipedia.org/w/api.php?action=query&titles=' . urlencode($municipio) . '&prop=pageimages&format=json&pithumbsize=500';
+            // URL del endpoint de la API de Wikipedia para obtener la imagen del municipio
+            $url = 'https://es.wikipedia.org/w/api.php?action=query&titles=' . urlencode($municipio) . '&prop=pageimages&format=json&pithumbsize=500';
 
-        // Realizar la solicitud GET a la API
-        $response = Http::get($url);
-        $data = $response->json();
+            // Realizar la solicitud GET a la API
+            $response = Http::get($url);
+            $data = $response->json();
 
-        // Verificar si la respuesta contiene la imagen
-        if (isset($data['query']['pages']) && !empty($data['query']['pages'])) {
-            $page = reset($data['query']['pages']);
-            if (isset($page['thumbnail']['source'])) {
-                $imageUrl = $page['thumbnail']['source'];
+            // Verificar si la respuesta contiene la imagen
+            if (isset($data['query']['pages']) && !empty($data['query']['pages'])) {
+                $page = reset($data['query']['pages']);
+                if (isset($page['thumbnail']['source'])) {
+                    $imageUrl = $page['thumbnail']['source'];
 
-                // Descargar la imagen
-                $imageResponse = Http::get($imageUrl);
-
-                if ($imageResponse->successful()) {
-                    // Obtener el contenido de la imagen
-                    $imageContent = $imageResponse->body();
-
-                    // Almacenar la imagen en la base de datos
-                    $poble->foto = $imageContent;
+                    // Almacenar la URL de la imagen en la base de datos
+                    $poble->foto = $imageUrl;
                     $poble->save();
                 } else {
-                    // Manejar el error si no se pudo descargar la imagen
+                    // Manejar el caso en que no se encontró la imagen en Wikipedia
                     // Puedes registrar el error o realizar alguna acción adicional
                 }
             } else {
-                // Manejar el caso en que no se encontró la imagen en Wikipedia
+                // Manejar el caso en que no se encontró la página del municipio en Wikipedia
                 // Puedes registrar el error o realizar alguna acción adicional
             }
-        } else {
-            // Manejar el caso en que no se encontró la página del municipio en Wikipedia
-            // Puedes registrar el error o realizar alguna acción adicional
         }
-    }
 
-    return response()->json(['message' => 'Fotos de los municipios actualizadas en la base de datos.']);
-}
+        return response()->json(['message' => 'Fotos de los municipios actualizadas en la base de datos.']);
+    }
 }
