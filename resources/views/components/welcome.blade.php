@@ -50,6 +50,17 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="provincias">
+            <button onclick="mostrarPueblosPorProvincia('Barcelona')">Barcelona</button>
+            <button onclick="mostrarPueblosPorProvincia('Girona')">Girona</button>
+            <!-- Agregar más provincias -->
+        </div>
+
+        <div class="pueblos">
+            <!-- Aquí se mostrarán los pueblos filtrados -->
+        </div>
+
     </div>
 </body>
 
@@ -87,4 +98,16 @@
             }
         });
     });
+
+    function mostrarPueblosPorProvincia(provincia) {
+        fetch(`/api/pueblos?provincia=${provincia}`)
+            .then(response => response.json())
+            .then(data => {
+                const pueblosDiv = document.querySelector('.pueblos');
+                pueblosDiv.innerHTML = '';
+                data.forEach(pueblo => {
+                    pueblosDiv.innerHTML += `<div>${pueblo.nombre}</div>`;
+                });
+            });
+    }
 </script>
