@@ -5,7 +5,7 @@ use App\Http\Controllers\MainController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [MainController::class, 'index'])->name('main.index');
-Route::post('/infoMunicipi', [MainController::class, 'obtenirById'])->name('ajax.municipi.obtenirById');
+Route::post('/', [MainController::class, 'obtenirById'])->name('ajax.main.obtenirById');
 
 
 Route::middleware([
@@ -13,7 +13,7 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [AdminController::class,'index'])->name('dashboard');
+    Route::post('/dashboard', [AdminController::class, 'obtenirById'])->name('ajax.welcome.obtenirById');
+    
 });

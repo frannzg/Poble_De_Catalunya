@@ -124,7 +124,7 @@
 
             $.ajax({
                 type: "POST",
-                url: "{{ route('ajax.municipi.obtenirById') }}", // Ruta para obtener los datos del municipio
+                url: "{{ route('ajax.main.obtenirById') }}", // Ruta para obtener los datos del municipio
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },

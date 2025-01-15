@@ -18,8 +18,6 @@ class MainController extends Controller
 
     public function obtenirById(Request $request)
     {
-
-
         $id = $request->input('id');
         $poble = Poble::find($id);
 
