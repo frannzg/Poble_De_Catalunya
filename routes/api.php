@@ -11,6 +11,6 @@ Route::get('/user', function (Request $request) {
 Route::get('/poble', [PobleController::class, 'index']);  
 Route::get('/poble/{id}', [PobleController::class, 'show']);  
 Route::get('/obtenirPobles', [PobleController::class, 'obtenirPobles']);
-Route::get('/actualizarDatosMunicipios', [PobleController::class, 'actualizarDatosMunicipios']);
+Route::get('/afegirDadesRestants', [PobleController::class, 'afegirDadesRestants']);
 
 
