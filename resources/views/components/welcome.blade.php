@@ -23,99 +23,43 @@
                 <p style="text-align: center; font-family: auto; font-size: 20px;">
                     Clica sobre qualsevol comarca o província per veure els pobles que hi pertanyen.
                     <button style="background-color: blue; color: white; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-family: cursive;" onclick="window.location.href='https://dam2m6.codifi.cat/pobles/create'">
-                        Afegir
+                        Afegire
                     </button>
                 </p>
 
             </div>
         </div>
 
-        <div style="display: flex; justify-content: center; padding: 20px;">
-            <table id="myTable" style="text-align: center; width: 90%; border: 1px solid #ddd; border-collapse: collapse;">
+        <div style="display: flex; justify-content: center; padding: 20px; width: 100%;">
+            <table id="myTable" style="text-align: center; border: 1px solid #ddd; border-collapse: collapse;">
+
                 <thead>
                     <tr>
-                        <th>Nom</th>
-                        <th>Comarca</th>
-                        <th>Provincia</th>
-                        <th>Accions</th>
+                        <th style="text-align: center;">CODI</th>
+                        <th style="text-align: center;">NOM</th>
+                        <th style="text-align: center;">COMARCA</th>
+                        <th style="text-align: center;">PROVINCIA</th>
+                        <th style="text-align: center;">ACCIONS</th>
                     </tr>
                 </thead>
                 <tbody>
+                    
                     <tr>
-                        <td>Reus</td>
-                        <td>Baix Camp</td>
-                        <td>Tarragona</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
                         <td>
                             <div class="flex flex-row items-center justify-center" style="column-gap: 0.6rem;">
                                 <div>
                                     <button id="editar_btn" onclick="editarMaterial('')">
-                                        <img src="{{ asset('build/assets/iconoVisualizar.png') }}" alt="Icono de editar" width="30" style="background-color:orange; border-radius: 5px;">
-                                    </button>
-                                </div>
-                                <div>
-                                    <button id="editar_btn" onclick="editarMaterial('')">
-                                        <img src="{{ asset('build/assets/iconoEditar.png') }}" alt="Icono de editar" width="30" style="background-color:blue; border-radius: 5px;">
-                                    </button>
-                                </div>
-
-                                <div>
-                                    <button id="editar_btn" onclick="editarMaterial('')">
-                                        <img src="{{ asset('build/assets/iconoEliminar.png') }}" alt="Icono de editar" width="30" style="background-color:red; border-radius: 5px;">
+                                        <img src="{{ asset('build/assets/iconoVisualizar.png') }}" alt="Icono de editar" width="30" style="background-color:yellow; border-radius: 5px;">
                                     </button>
                                 </div>
                             </div>
                         </td>
                     </tr>
-                    <tr>
-                        <td>Alguaire</td>
-                        <td>Segrià</td>
-                        <td>Lleida</td>
-                        <td>
-                            <div class="flex flex-row items-center justify-center" style="column-gap: 0.6rem;">
-                                <div>
-                                    <button id="editar_btn" onclick="editarMaterial('')">
-                                        <img src="{{ asset('build/assets/iconoVisualizar.png') }}" alt="Icono de editar" width="30" style="background-color:orange; border-radius: 5px;">
-                                    </button>
-                                </div>
-                                <div>
-                                    <button id="editar_btn" onclick="editarMaterial('')">
-                                        <img src="{{ asset('build/assets/iconoEditar.png') }}" alt="Icono de editar" width="30" style="background-color:blue; border-radius: 5px;">
-                                    </button>
-                                </div>
-
-                                <div>
-                                    <button id="editar_btn" onclick="editarMaterial('')">
-                                        <img src="{{ asset('build/assets/iconoEliminar.png') }}" alt="Icono de editar" width="30" style="background-color:red; border-radius: 5px;">
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Sabadell</td>
-                        <td>Valles Occidental</td>
-                        <td>Barcelona</td>
-                        <td>
-                            <div class="flex flex-row items-center justify-center" style="column-gap: 0.6rem;">
-                                <div>
-                                    <button id="editar_btn" onclick="editarMaterial('')">
-                                        <img src="{{ asset('build/assets/iconoVisualizar.png') }}" alt="Icono de editar" width="30" style="background-color:orange; border-radius: 5px;">
-                                    </button>
-                                </div>
-                                <div>
-                                    <button id="editar_btn" onclick="editarMaterial('')">
-                                        <img src="{{ asset('build/assets/iconoEditar.png') }}" alt="Icono de editar" width="30" style="background-color:blue; border-radius: 5px;">
-                                    </button>
-                                </div>
-
-                                <div>
-                                    <button id="editar_btn" onclick="editarMaterial('')">
-                                        <img src="{{ asset('build/assets/iconoEliminar.png') }}" alt="Icono de editar" width="30" style="background-color:red; border-radius: 5px;">
-                                    </button>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
+                    
                 </tbody>
             </table>
         </div>
@@ -134,24 +78,24 @@
             "responsive": true,
             "language": {
                 "decimal": "",
-                "emptyTable": "No hay datos disponibles en la tabla",
-                "info": "Mostrando _START_ a _END_ de _TOTAL_ entradas",
-                "infoEmpty": "Mostrando 0 a 0 de 0 entradas",
-                "infoFiltered": "(filtrado de _MAX_ entradas totales)",
-                "lengthMenu": "Mostrar _MENU_ entradas",
-                "loadingRecords": "Cargando...",
-                "processing": "Procesando...",
+                "emptyTable": "No hi ha dades disponibles",
+                "info": "Mostrant _START_ a _END_ de _TOTAL_ entrades",
+                "infoEmpty": "Mostrant 0 a 0 de 0 entrades",
+                "infoFiltered": "(filtrado de _MAX_ entrades totales)",
+                "lengthMenu": "Mostrar _MENU_ entrades",
+                "loadingRecords": "Cargant...",
+                "processing": "Procesant...",
                 "search": "Buscar:",
-                "zeroRecords": "No se encontraron registros coincidentes",
+                "zeroRecords": "No s'ha trobat registres coincidents",
                 "paginate": {
-                    "first": "Primero",
-                    "last": "Último",
-                    "next": "Siguiente",
+                    "first": "Primer",
+                    "last": "Últim",
+                    "next": "Següent",
                     "previous": "Anterior"
                 },
                 "aria": {
-                    "sortAscending": ": activar para ordenar la columna ascendente",
-                    "sortDescending": ": activar para ordenar la columna descendente"
+                    "sortAscending": ": activar per ordenar la columna ascendent",
+                    "sortDescending": ": activar per ordenar la columna descendent"
                 }
             }
         });
