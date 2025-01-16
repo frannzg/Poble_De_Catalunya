@@ -25,6 +25,7 @@ return new class extends Migration
             $table->integer('poblacio')->nullable();
             $table->string('codi');
             $table->string('codiComarca');
+            $table->integer('updated');
             $table->timestamps();
         });
     }

@@ -117,6 +117,7 @@ class PobleController extends Controller
                         'altitud' => null, // Assigna l'altitud si la tens
                         'superficie' => null, // Assigna la superfície si la tens
                         'poblacio' => null, // Assigna la població si la tens
+                        'updated' => 0,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];
@@ -130,9 +131,9 @@ class PobleController extends Controller
             Log::error("Error al realizar el proceso: {$e->getMessage()}");
         }
 
-        try{
+        try {
             $this->afegirDadesRestants();
-        } catch(Exception $z){
+        } catch (Exception $z) {
             Log::error("Error al ejecutar la función afegirDadesRestants, error body: {$z->getMessage()}");
         }
 
@@ -142,7 +143,7 @@ class PobleController extends Controller
     public function afegirDadesRestants()
     {
         // Obtenir tots els municipis de la base de dades
-        $pobles = Poble::all();
+        $pobles = Poble::all()->where('updated', 0);
 
         foreach ($pobles as $poble) {
             // Obtenir el nom del municipi i tractar noms amb coma
@@ -174,16 +175,26 @@ class PobleController extends Controller
             foreach ($wikiImgData["query"]["search"] as $key => $curr) {
 
                 if (str_contains($curr['title'], '.png') || str_contains($curr['title'], '.jpg') || str_contains($curr['title'], '.jpeg' || str_contains($curr['title'], '.svg'))) {
-                        $imagenFileName = $curr['title'];
-                        $imagenPageId = $curr['pageid'];
-                        $wikiUrlImg = "https://commons.wikimedia.org/w/api.php?action=query&titles={$imagenFileName}&prop=imageinfo&iiprop=url&format=json";
-                        $wikiImgUrlResponse = Http::get($wikiUrlImg);
-                        $wikiImgUrlData = $wikiImgUrlResponse->json();
-                        if($key == 0){
-                            $imagenes = $wikiImgUrlData["query"]["pages"][$imagenPageId]["imageinfo"][0]["url"];
-                        } else {
+                    $imagenFileName = $curr['title'];
+                    $imagenPageId = $curr['pageid'];
+                    $wikiUrlImg = "https://commons.wikimedia.org/w/api.php?action=query&titles={$imagenFileName}&prop=imageinfo&iiprop=url&format=json";
+                    $wikiImgUrlResponse = Http::get($wikiUrlImg);
+                    $wikiImgUrlData = $wikiImgUrlResponse->json();
+
+                    
+
+                    if ($key == 0 && $imagenPageId != "") {
+                        $imagenes = $wikiImgUrlData["query"]["pages"][$imagenPageId]["imageinfo"][0]["url"];
+                    } else if ($imagenPageId != "" && $key !=0) {
+                        try{
                             $imagenes .= "####" . $wikiImgUrlData["query"]["pages"][$imagenPageId]["imageinfo"][0]["url"];
+                        } catch (Exception $x){
+                            Log::error($x->getMessage());
                         }
+                    } else if ($imagenPageId == "") {
+                        $imagenes = "";
+                    }
+                    // usleep(200000);
                 }
             }
 
@@ -195,6 +206,7 @@ class PobleController extends Controller
             $altitud = "No s'ha trobat resultats";
             $superficie = "No s'ha trobat resultats";
             $poblacio = "No s'ha trobat resultats";
+            $updated = 1;
 
             // Verificar si la resposta de Wikipedia conté dades de la pàgina
             if (isset($wikiData['query']['pages']) && !empty($wikiData['query']['pages'])) {
@@ -254,6 +266,7 @@ class PobleController extends Controller
             $poble->altitud = $altitud;
             $poble->superficie = $superficie;
             $poble->poblacio = $poblacio;
+            $poble->updated = $updated;
             $poble->save();
         }
 

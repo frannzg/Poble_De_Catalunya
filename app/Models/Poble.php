@@ -22,6 +22,6 @@ class Poble extends Model
         'poblacio',
         'codi',
         'codiComarca',
-        
+        'updated',
     ];
 }

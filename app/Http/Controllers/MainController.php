@@ -22,11 +22,12 @@ class MainController extends Controller
         $poble = Poble::find($id);
 
         if (!$poble) {
-            return response()->json(['message' => 'pobleo no encontrado'], 404);
+            return response()->json(['message' => 'Poble no encontrado'], 404);
         }
 
+        // Envolver en un array para que el frontend pueda manejarlo como 'poble[0]'
         return response()->json([
-            'poble' => $poble // Asegúrate de que esta estructura coincida con la que usas en el AJAX
+            'poble' => [$poble]
         ]);
     }
 }
