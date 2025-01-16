@@ -10,6 +10,8 @@
         <script src="{{ asset('build/assets/jquery-3.7.1.min.js') }}"></script>
         <script src="{{ asset('build/assets/jquery-confirm.min.js') }}"></script>
         <script src="{{ asset('build/assets/datatables.min.js') }}"></script>
+        <link href="path/to/select2.min.css" rel="stylesheet" />
+        <script src="path/to/select2.min.js"></script>
 
         <title>Pobles de Catalunya</title>
     </head>
@@ -123,6 +125,33 @@
                             <img src="{{ asset('build/assets/iconoCrear.png') }}" width="20"><span>Crear</span>
                         </button>
                     </div>
+
+                    <div>
+                        <div style="display: flex; justify-content: center; margin-top: 2rem; gap: 1rem;">
+                            <!-- Primer select -->
+                            <select id="provincia-select" name="provincia" class="form-control" style="background: lightblue; text-align: center; font-size: 17px; width: auto;">
+                                <option value="">Selecciona una provincia</option>
+                                @foreach($provinciaTotal as $provincia)
+                                <option value="{{ $provincia->provincia }}">{{ $provincia->provincia }}</option>
+                                @endforeach
+                            </select>
+
+                            <!-- Segundo select -->
+                            <select id="provincia-select" name="provincia" class="form-control" style="background: lightblue; text-align: center; font-size: 17px; width: auto;">
+                                <option value="">Selecciona una comarca</option>
+                                @foreach($comarcatotal as $comarca)
+                                <option value="{{ $provincia->provincia }}">{{ $comarca->comarca }}</option>
+                                @endforeach
+                            </select>
+
+                            <button id="crear-btn" href="" style="display: flex; flex-direction: row; align-items: center; justify-content: center;  column-gap: 0.4rem; background-color: coral; padding: 0.6rem; border-radius: 10px; text-transform: uppercase; color: white;">
+                                <img src="{{ asset('build/assets/iconoCercador.png') }}" width="20"><span>Filtra</span>
+                            </button>
+                        </div>
+                    </div>
+
+
+
                 </div>
 
                 <div style="justify-content: center; padding: 20px; width: 100%;  display: none;" id="myTableContainer">
@@ -216,8 +245,16 @@
                 content: `
                             <form id="crearForm" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 1rem; max-width: 800px; margin: auto; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                                 <div style="display: flex; flex-direction: column;">
+                                    <label for="codi" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Codi municipi:</label>
+                                    <input type="number" id="codi" name="codi" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                </div>
+                                <div style="display: flex; flex-direction: column;">
                                     <label for="nom" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Nom:</label>
                                     <input type="text" id="nom" name="nom" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                </div>
+                                <div style="display: flex; flex-direction: column;">
+                                    <label for="codiComarca" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Codi comarca:</label>
+                                    <input type="number" id="codiComarca" name="codiComarca" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
                                     <label for="comarca" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Comarca:</label>
@@ -255,18 +292,24 @@
                                     <label for="foto" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Foto URL:</label>
                                     <input type="text" id="foto" name="foto" style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
-                                <div style="grid-column: span 2; text-align: center;">
-                                    <button type="submit" style="background-color: #28a745; color: white; padding: 0.8rem 1.5rem; border-radius: 5px; font-size: 16px; cursor: pointer; border: none; transition: background-color 0.3s;">
-                                        Crear Pueblo
-                                    </button>
-                                </div>
                             </form>
             `,
                 type: 'green',
                 buttons: {
                     Crear: function() {
 
-                        var formData = $("#crearForm").serialize();
+                        let nom = $("#nom").val();
+                        let comarca = $("#comarca").val();
+                        let provincia = $("#provincia").val();
+                        let poblacio = $("#poblacio").val();
+                        let descripcio = $("#descripcio").val();
+                        let latitud = $("#latitud").val();
+                        let logintud = $("#logintud").val();
+                        let altitud = $("#altitud").val();
+                        let superficie = $("#superficie").val();
+                        let foto = $("#foto").val();
+                        let codi = $("#codi").val();
+                        let codiComarca = $("#codiComarca").val();
 
                         $.ajax({
                             url: "{{ route('ajax.welcome.crear') }}",
@@ -275,7 +318,19 @@
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
                             data: {
-                                formData
+                                nom: nom,
+                                comarca: comarca,
+                                provincia: provincia,
+                                poblacio: poblacio,
+                                descripcio: descripcio,
+                                latitud: latitud,
+                                logintud: logintud,
+                                altitud: altitud,
+                                superficie: superficie,
+                                foto: foto,
+                                codi: codi,
+                                codiComarca: codiComarca,
+                                updated: 1
                             },
                             success: function(response) {
                                 if (response.success) {

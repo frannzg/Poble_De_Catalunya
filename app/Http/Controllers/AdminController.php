@@ -12,7 +12,17 @@ class AdminController extends Controller
     public function index()
     {
         $pobles = DB::table('pobles')->get()->toArray();
-        return view("components.welcome", compact("pobles"));
+
+        $provinciaTotal = DB::table('pobles')
+                ->select('provincia', DB::raw('COUNT(*) as total'))
+                ->groupBy('provincia')
+                ->get();
+
+        $comarcatotal = DB::table('pobles')
+                ->select('comarca', DB::raw('COUNT(*) as total'))
+                ->groupBy('comarca')
+                ->get();
+        return view("components.welcome", compact("pobles","provinciaTotal","comarcatotal"));
     }
 
     //Obtenir el ID del municipi
@@ -29,14 +39,13 @@ class AdminController extends Controller
     }
 
     //Crear un municpi
-    public function crear(Request $request) {
+    public function crear(Request $request)
+    {
         dd($request);
     }
 
     //Editar un municipi
-    public function editar (Request $request){
-        
-    }
+    public function editar(Request $request) {}
 
     //Eliminar municipi
     public function eliminar(Request $request)
