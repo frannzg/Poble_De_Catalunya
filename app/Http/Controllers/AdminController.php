@@ -30,12 +30,26 @@ class AdminController extends Controller
     {
         $id = $request->input('id');
         $poble = Poble::select('*')->where('codi', $id)->first();
-
+        
         if (!$poble) {
             return response()->json(['message' => 'Poble no trobat'], 404);
         }
 
-        return response()->json(['poble' => $poble], 200);
+        return response()->json([
+            'codi' => $poble->codi,
+            'nom' => $poble->nom,
+            'comarca' => $poble->comarca,
+            'provincia' => $poble->provincia,
+            'descripcio' => $poble->descripcio,
+            'foto' => $poble->foto,
+            'latitud' => $poble->latitud,
+            'longitud' => $poble->longitud,
+            'altitud' => $poble->altitud,
+            'superficie' => $poble->superficie,
+            'poblacio' => $poble->poblacio,
+            'codi' => $poble->codi,
+            'codiComarca' => $poble->codiComarca
+        ], 200);
     }
 
     //Crear un municpi
@@ -82,6 +96,7 @@ class AdminController extends Controller
 
     //Editar un municipi
     public function editar(Request $request) {
+        
     }
 
     //Eliminar municipi
