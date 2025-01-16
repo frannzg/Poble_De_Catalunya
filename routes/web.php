@@ -17,4 +17,5 @@ Route::middleware([
     Route::post('/dashboard', [AdminController::class, 'obtenirById'])->name('ajax.welcome.obtenirById');
     Route::post('/dashboard/editar', [AdminController::class, 'editar'])->name('ajax.welcome.editar');
     Route::post('/dashboard/eliminar', [AdminController::class, 'eliminar'])->name('ajax.welcome.eliminar');
+    
 });

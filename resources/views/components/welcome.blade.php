@@ -176,7 +176,7 @@
                                 <td>
                                     <div class="flex flex-row items-center justify-center" style="column-gap: 0.6rem;">
                                         <div>
-                                            <button id="vusualitzar-btn" onclick="visualitzarMunicipi('{{$curr->codi}}')">
+                                            <button id="vusualitzar-btn" onclick="visualitzarMunicipi('{{$curr->id}}')">
                                                 <img src="{{ asset('build/assets/iconoVisualizar.png') }}" alt="Icono de editar" width="30" style="background-color:yellow; border-radius: 5px;">
                                             </button>
                                         </div>
@@ -239,6 +239,122 @@
             $('#myTableContainer').css('display', 'flex');
         });
 
+        function visualitzarMunicipi(id) {
+
+            $.ajax({
+                type: "POST",
+                url: "{{ route('ajax.main.obtenirById') }}",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    id: id,
+                },
+                success: function(response) {
+
+                    let poble = response.poble; // Cambié 'municipi' a 'poble'
+
+                    console.log(response); // Muestra toda la respuesta para inspeccionarla
+                    console.log(response.foto); //
+
+                    // Dividir la cadena de fotos en un array de URLs
+                    let fotosArray = poble[0].foto.split("####");
+
+                    // Crear las etiquetas <img> para cada URL
+                    let imagenesHTML = fotosArray.map(url => {
+                        if (url != "") {
+                            return `<div style="flex: 1 0 45%; margin-bottom: 1rem; display: flex; justify-content: center;">
+<img src="${url}" alt="Imagen del municipio" style="height: 500; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+</div>`;
+                        }
+                    }).join("");
+                    // Unir todas las imágenes en una sola cadena
+
+                    let fichaVisualizar = `
+
+<div class="loader" style="">
+    <div class="justify-content-center jimu-primary-loading"></div>
+</div>
+<div id="fotoContainer" style="display: none; flex-wrap: wrap; gap: 2rem; font-family: Arial, sans-serif; padding: 2rem; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+
+    <div style="flex: 1; max-width: 100%; min-width: 250px; display: flex; flex-direction: column; align-items: center;">
+    <strong style="font-size: 40px; color:rgb(1, 8, 186); font-weight: bold; text-align: center;">${poble[0].nom}</strong>
+    <br><br>
+    <strong style="font-size: 20px; color: black; text-align: center;">Descripció:</strong>
+    <p style="font-size: 16px; color: black; text-align: center; width: 100%;">${poble[0].descripcio}</p>
+</div>
+
+<!-- Imágenes en columnas de 2 -->
+<div style="flex: 1 0 100%; display: flex; flex-wrap: wrap; gap: 1rem;">
+    ${imagenesHTML} <!-- Mostrar todas las imágenes en 2 columnas -->
+</div>
+</div>
+
+<br><br>
+
+<div style="font-size: 18px; color: black; padding: 2rem; display: none; background-color: white;" id="tablaContainer">
+<h1 style="font-size: 24px; font-weight: bold; color: black;">Característiques:</h1>
+
+<table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+    <thead>
+        <tr>
+            <th
+                style="padding: 10px; text-align: left; background-color: #ecf0f1; color: red; border: 1px solid #ddd;">
+                Latitud</th>
+            <th
+                style="padding: 10px; text-align: left; background-color: #ecf0f1; color: red; border: 1px solid #ddd;">
+                Longitud</th>
+            <th
+                style="padding: 10px; text-align: left; background-color: #ecf0f1; color: red; border: 1px solid #ddd;">
+                Altitud</th>
+            <th
+                style="padding: 10px; text-align: left; background-color: #ecf0f1; color: red; border: 1px solid #ddd;">
+                Superficie</th>
+            <th
+                style="padding: 10px; text-align: left; background-color: #ecf0f1; color: red; border: 1px solid #ddd;">
+                Població</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${poble[0].latitud}</td>
+            <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${poble[0].longitud}</td>
+            <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${parseFloat(poble[0].altitud)}</td>
+            <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">
+                ${parseFloat(poble[0].superficie).toFixed(2)}</td>
+            <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${poble[0].poblacio}</td>
+        </tr>
+    </tbody>
+</table>
+</div>
+`;
+
+                    var visualizarConfirm = $.confirm({
+                        title: "Informació del municipi",
+                        content: fichaVisualizar,
+                        draggable: false,
+                        closeIcon: false,
+                        theme: 'supervan',
+                        buttons: {
+                            Tanca: function() {
+                                visualizarConfirm.close();
+                            }
+                        }
+                    });
+
+                    setTimeout(() => {
+                        $("#fotoContainer").css("display", 'flex');
+                        $("#tablaContainer").css("display", "block");
+                        $(".loader").css("display", "none");
+                    }, 1000);
+
+                },
+                error: function(error) {
+                    console.log("Error al obtener el municipio:", error);
+                    alert(`Hubo un error al intentar obtener los datos del municipio: ${error}`);
+                }
+            });
+        }
         $("#crear-btn").click(function() {
             $.confirm({
                 title: 'Crear un nou Municipi',
@@ -290,6 +406,7 @@
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
                                     <label for="foto" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Foto URL:</label>
+                                    <label for="foto" style="font-weight: bold; color: red; margin-bottom: 0.5rem;">(Si desitges afegir més d'una imatge, separa les adreces URL amb '####', https://exemple.com/imatge1.jpg####https://exemple.com/imatge2.jpg.)</label>
                                     <input type="text" id="foto" name="foto" style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                             </form>
@@ -339,6 +456,7 @@
                                         content: 'Poble creat amb èxit.',
                                         type: 'green',
                                     });
+                                    location.reload();
                                 } else {
                                     $.alert({
                                         title: 'Error',
@@ -363,11 +481,10 @@
             });
         });
 
-        function visualitzarMunicipi(id) {
-
+        function editarMunicipi(id) {
             $.ajax({
                 type: "POST",
-                url: "{{ route('ajax.welcome.obtenirById') }}", // Ruta para obtener los datos del municipio
+                url: "{{ route('ajax.welcome.obtenirById') }}",
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
@@ -375,114 +492,166 @@
                     id: id,
                 },
                 success: function(response) {
-                    // Asegúrate de que estás accediendo a los datos correctamente:
-                    let poble = response.poble; // Cambié 'municipi' a 'poble'
 
-                    // Dividir la cadena de fotos en un array de URLs
-                    let fotosArray = poble[0].foto.split("####");
-
-                    // Crear las etiquetas <img> para cada URL
-                    let imagenesHTML = fotosArray.map(url => {
-                        if (url != "") {
-                            return `<div style="flex: 1 0 45%; margin-bottom: 1rem; display: flex; justify-content: center;">
-                        <img src="${url}" alt="Imagen del municipio" style="height: 500; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                    </div>`;
-                        }
-                    }).join("");
-                    // Unir todas las imágenes en una sola cadena
-
-                    let fichaVisualizar = `
-
-                        <div class="loader" style="">
-                            <div class="justify-content-center jimu-primary-loading"></div>
+                    let formularioEditar = `
+            
+                      <form id="crearForm" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 1rem; max-width: 800px; margin: auto; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="codi" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Codi municipi:</label>
+                            <input type="number" id="codi" name="codi" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                         </div>
-                        <div id="fotoContainer" style="display: none; flex-wrap: wrap; gap: 2rem; font-family: Arial, sans-serif; padding: 2rem; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-
-                            <div style="flex: 1; max-width: 100%; min-width: 250px; display: flex; flex-direction: column; align-items: center;">
-                            <strong style="font-size: 40px; color:rgb(1, 8, 186); font-weight: bold; text-align: center;">${poble[0].nom}</strong>
-                            <br><br>
-                            <strong style="font-size: 20px; color: black; text-align: center;">Descripció:</strong>
-                            <p style="font-size: 16px; color: black; text-align: center; width: 100%;">${poble[0].descripcio}</p>
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="nom" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Nom:</label>
+                            <input type="text" id="nom" name="nom" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                         </div>
-
-                        <!-- Imágenes en columnas de 2 -->
-                        <div style="flex: 1 0 100%; display: flex; flex-wrap: wrap; gap: 1rem;">
-                            ${imagenesHTML} <!-- Mostrar todas las imágenes en 2 columnas -->
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="codiComarca" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Codi comarca:</label>
+                            <input type="number" id="codiComarca" name="codiComarca" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                         </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="comarca" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Comarca:</label>
+                            <input type="text" id="comarca" name="comarca" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                         </div>
-
-                        <br><br>
-
-                        <div style="font-size: 18px; color: black; padding: 2rem; display: none; background-color: white;" id="tablaContainer">
-                        <h1 style="font-size: 24px; font-weight: bold; color: black;">Característiques:</h1>
-
-                        <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
-                            <thead>
-                                <tr>
-                                    <th
-                                        style="padding: 10px; text-align: left; background-color: #ecf0f1; color: red; border: 1px solid #ddd;">
-                                        Latitud</th>
-                                    <th
-                                        style="padding: 10px; text-align: left; background-color: #ecf0f1; color: red; border: 1px solid #ddd;">
-                                        Longitud</th>
-                                    <th
-                                        style="padding: 10px; text-align: left; background-color: #ecf0f1; color: red; border: 1px solid #ddd;">
-                                        Altitud</th>
-                                    <th
-                                        style="padding: 10px; text-align: left; background-color: #ecf0f1; color: red; border: 1px solid #ddd;">
-                                        Superficie</th>
-                                    <th
-                                        style="padding: 10px; text-align: left; background-color: #ecf0f1; color: red; border: 1px solid #ddd;">
-                                        Població</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${poble[0].latitud}</td>
-                                    <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${poble[0].longitud}</td>
-                                    <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${parseFloat(poble[0].altitud)}</td>
-                                    <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">
-                                        ${parseFloat(poble[0].superficie).toFixed(2)}</td>
-                                    <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${poble[0].poblacio}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="provincia" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Provincia:</label>
+                            <input type="text" id="provincia" name="provincia" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                         </div>
-                    `;
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="poblacio" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Población:</label>
+                            <input type="number" id="poblacio" name="poblacio" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                        </div>
+                        <div style="display: flex; flex-direction: column; grid-column: span 2;">
+                            <label for="descripcio" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Descripción:</label>
+                            <textarea id="descripcio" name="descripcio" required style="width: 100%; height: 150px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;"></textarea>
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="latitud" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Latitud:</label>
+                            <input type="text" id="latitud" name="latitud" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="longitud" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Longitud:</label>
+                            <input type="text" id="longitud" name="longitud" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="altitud" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Altitud:</label>
+                            <input type="text" id="altitud" name="altitud" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="superficie" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Superficie:</label>
+                            <input type="text" id="superficie" name="superficie" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <label for="foto" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Foto URL:</label>
+                            <label for="foto" style="font-weight: bold; color: red; margin-bottom: 0.5rem;">(Si desitges afegir més d’una imatge, separa les adreces URL amb ‘####’)</label>
+                            <input type="text" id="foto" name="foto" style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                        </div>
+                    </form>
+            `;
 
-                    var visualizarConfirm = $.confirm({
-                        title: "Informació del municipi",
-                        content: fichaVisualizar,
+                    var editarConfirm = $.confirm({
+                        title: "Editar Municipi",
+                        content: formularioEditar,
                         draggable: false,
                         closeIcon: false,
-                        theme: 'supervan',
                         buttons: {
                             Tanca: function() {
                                 visualizarConfirm.close();
                             }
-                        }
+                        },
+                        onOpenBefore: function() {
+                            var self = this;
+
+                            this.$content.find('#guardarForm-btn').on('click', function(event) {
+                                event.preventDefault();
+
+                                let nom = $("#nom").val();
+                                let comarca = $("#comarca").val();
+                                let provincia = $("#provincia").val();
+                                let poblacio = $("#poblacio").val();
+                                let descripcio = $("#descripcio").val();
+                                let latitud = $("#latitud").val();
+                                let longitud = $("#longitud").val();
+                                let altitud = $("#altitud").val();
+                                let superficie = $("#superficie").val();
+                                let foto = $("#foto").val();
+                                let codi = $("#codi").val();
+                                let codiComarca = $("#codiComarca").val();
+
+                                $.ajax({
+                                    type: "POST",
+                                    url: "{{ route('ajax.welcome.editar') }}",
+                                    processData: false,
+                                    contentType: false,
+                                    headers: {
+                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                    },
+                                    data: {
+                                        nom: nom,
+                                        comarca: comarca,
+                                        provincia: provincia,
+                                        poblacio: poblacio,
+                                        descripcio: descripcio,
+                                        latitud: latitud,
+                                        longitud: longitud,
+                                        altitud: altitud,
+                                        superficie: superficie,
+                                        foto: foto,
+                                        codi: codi,
+                                        codiComarca: codiComarca
+                                    },
+                                    success: function(response) {
+                                        $.confirm({
+                                            title: '¡ El municipi se ha actualizat correctament !',
+                                            content: 'El municipi se ha actualizat.',
+                                            type: 'green',
+                                            typeAnimated: true,
+                                            buttons: {
+                                                Aceptar: {
+                                                    text: 'Aceptar',
+                                                    btnClass: 'btn-green',
+                                                    action: function() {
+                                                        location.reload();
+                                                    }
+                                                },
+                                            }
+                                        });
+                                    },
+                                    error: function(xhr, status, error) {
+                                        $.confirm({
+                                            title: 'Error, el municipi no s\'ha pogut actualitzar !',
+                                            content: 'El municipi no s\'ha actualitzat',
+                                            type: 'red',
+                                            typeAnimated: true,
+                                            buttons: {
+                                                Aceptar: {
+                                                    text: 'Aceptar',
+                                                    btnClass: 'btn-green',
+                                                    action: function() {
+                                                        location.reload();
+                                                    }
+                                                },
+                                            }
+                                        });
+                                    }
+                                });
+                            });
+
+                            this.$content.find('#cerrar-btn').on('click', function(event) {
+                                event.preventDefault();
+                                self.close();
+                            });
+                        },
                     });
-
-                    setTimeout(() => {
-                        $("#fotoContainer").css("display", 'flex');
-                        $("#tablaContainer").css("display", "block");
-                        $(".loader").css("display", "none");
-                    }, 1000);
-
                 },
-                error: function(error) {
-                    console.log("Error al obtener el municipio:", error);
-                    alert(`Hubo un error al intentar obtener los datos del municipio: ${error}`);
+                error: function(xhr, status, error) {
+                    $.alert("Ocurrió un error al enviar los datos.");
+                    console.error(error);
                 }
             });
         }
 
-        function editarMunicipi($id) {
-
-        }
 
         function eliminarMunicipi(id) {
-            console.log("ID recibido:", id); // Verifica que el ID es correcto
             $.confirm({
                 title: 'Eliminar Municipi',
                 content: '¿Estàs segur que vols eliminar aquest poble?',
