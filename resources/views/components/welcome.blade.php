@@ -5,18 +5,74 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
         <!-- Enllaços o scripts -->
+
         <link rel="stylesheet" href="{{ asset('build/assets/jquery-confirm.min.css') }}">
         <link rel="stylesheet" href="{{ asset('build/assets/datatables.min.css') }}">
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
         <script src="{{ asset('build/assets/jquery-3.7.1.min.js') }}"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
         <script src="{{ asset('build/assets/jquery-confirm.min.js') }}"></script>
         <script src="{{ asset('build/assets/datatables.min.js') }}"></script>
-        <link href="path/to/select2.min.css" rel="stylesheet" />
-        <script src="path/to/select2.min.js"></script>
+
 
         <title>Pobles de Catalunya</title>
     </head>
 
     <style>
+        /* *** ESTILS BOTONS *** */
+        button {
+            transition: all 0.3s ease;
+        }
+
+        /* Hover para botones */
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Activo (clic) en botones */
+        button:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Estilo para botones con imágenes */
+        button img {
+            transition: transform 0.3s ease;
+        }
+
+        button:hover img {
+            transform: rotate(10deg);
+        }
+
+        button:active img {
+            transform: rotate(-10deg) scale(0.95);
+        }
+
+        /* Cambios al pasar el mouse */
+        a:hover {
+            background-color: lightgray;
+            /* Cambia el fondo */
+            color: black;
+            /* Cambia el color del texto */
+            transform: scale(1.05);
+            /* Aumenta el tamaño ligeramente */
+            transition: all 0.3s ease;
+            /* Transición suave */
+        }
+
+        /* Cambios al hacer clic */
+        a:active {
+            background-color: gray;
+            /* Fondo más oscuro al hacer clic */
+            transform: scale(0.95);
+            /* Reduce el tamaño ligeramente */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            /* Agrega un efecto de sombra */
+        }
+
+        /* *** FIN ESTILS BOTONS *** */
+
         div.dt-container {
             width: 90%;
         }
@@ -109,15 +165,24 @@
                 height: 40px;
             }
         }
+
+        .select2-selection.select2-selection--multiple {
+            width: 100%;
+            min-width: 13rem;
+        }
+
+        .bg-gray-100{
+            background-color: #E5E7EB;
+        }
     </style>
 
     <body>
         <div>
             <div>
-                <div class="container my-3" style="    width: 100%; max-width: 100% !important;">
+                <div class="container my-3" style="width: 100%; max-width: 100% !important;">
                     <div>
                         <h1 style="text-align: center; font-family: auto; font-size: 40px;">Pobles de Catalunya</h1>
-                        <p style="text-align: center; font-family: auto; font-size: 20px;">Clica sobre qualsevol comarca o província per veure els pobles que hi pertanyen.</p>
+                        <p style="text-align: center; font-family: auto; font-size: 20px; color: red;">A sota del botó 'Crear', tens un filtre per filtrar per províncies o comarques.</p>
                     </div>
 
                     <div style="display: flex; flex-direction:row; align-items:center; justify-content:center; margin-top:2rem;">
@@ -127,24 +192,27 @@
                     </div>
 
                     <div>
-                        <div style="display: flex; justify-content: center; margin-top: 2rem; gap: 1rem;">
-                            
-                            <select id="provincia-select" name="provincia" class="form-control" style="background: lightblue; text-align: center; font-size: 17px; width: auto;">
-                                <option value="">Selecciona una provincia</option>
-                                @foreach($provinciaTotal as $provincia)
-                                <option value="{{ $provincia->provincia }}">{{ $provincia->provincia }}</option>
-                                @endforeach
-                            </select>
+                        <div style="display: flex; justify-content: center; margin-top: 2rem; gap: 1rem; flex-direction: column; align-items: center;">
 
-                           
-                            <select id="provincia-select" name="provincia" class="form-control" style="background: lightblue; text-align: center; font-size: 17px; width: auto;">
-                                <option value="">Selecciona una comarca</option>
-                                @foreach($comarcatotal as $comarca)
-                                <option value="{{ $provincia->provincia }}">{{ $comarca->comarca }}</option>
-                                @endforeach
-                            </select>
+                            <div id="provincia-container">
+                                <select id="provincia-select" name="provincia" class="form-control" style="background: lightblue; text-align: center; font-size: 17px; width: auto;">
+                                    <option value="XXXX">Totes les provincies</option>
+                                    @foreach($provinciaTotal as $provincia)
+                                    <option value="{{ $provincia->provincia }}">{{ $provincia->provincia }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                            <button id="crear-btn" href="" style="display: flex; flex-direction: row; align-items: center; justify-content: center;  column-gap: 0.4rem; background-color: coral; padding: 0.6rem; border-radius: 10px; text-transform: uppercase; color: white;">
+                            <div id="comarca-container" style="display: none;">
+                                <select id="comarca-select" name="comarca" class="form-control" style="background: lightblue; text-align: center; font-size: 17px; width: auto;" multiple="multiple">
+                                    <option value="ZZZZ">Totes les comarques</option>
+                                    @foreach($comarcatotal as $comarca)
+                                    <option value="{{ $comarca->comarca }}">{{ $comarca->comarca }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <button id="filtra-btn" name="filtra-btn" href="" style="display: flex; flex-direction: row; align-items: center; justify-content: center;  column-gap: 0.4rem; background-color: coral; padding: 0.6rem; border-radius: 10px; text-transform: uppercase; color: white;">
                                 <img src="{{ asset('build/assets/iconoCercador.png') }}" width="20"><span>Filtra</span>
                             </button>
                         </div>
@@ -182,7 +250,7 @@
                                         </div>
 
                                         <div>
-                                            <button id="editar-btn" onclick="editarMunicipi('{{$curr->codi}}')">
+                                            <button id="editar-btn" onclick="editarMunicipi('{{$curr->id}}')">
                                                 <img src="{{ asset('build/assets/iconoEditar.png') }}" alt="Icono de editar" width="30" style="background-color:blue; border-radius: 5px;">
                                             </button>
                                         </div>
@@ -236,14 +304,122 @@
                     }
                 }
             });
+
+            $('#provincia-select').select2();
+            $('#comarca-select').select2();
             $('#myTableContainer').css('display', 'flex');
         });
 
-        function visualitzarMunicipi(id) {
+        $('#provincia-select').on('change', function(e) {
+            e.preventDefault();
 
+            let value = $('#provincia-select').val();
+
+            if (value == "XXXX") {
+                $('#comarca-container').css('display', 'none');
+            } else {
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('ajax.welcome.recarregaSelectComarques') }}",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        data: value,
+                    },
+                    success: function(response) {
+                        $('#comarca-select').empty();
+                        const optionsSelectComarca = response.map(comarca =>
+                            `<option value="${comarca.codiComarca}">${comarca.comarca}</option>`
+                        ).join('');
+                        $('#comarca-select').append(optionsSelectComarca);
+                        $('#comarca-select').trigger('change');
+                        console.log(optionsSelectComarca);
+                    },
+                    error: function(error) {
+                        console.log("Error al obtener el municipio:", error);
+                    }
+                })
+                $('#comarca-container').css('display', 'block');
+            }
+        })
+
+        $("#filtra-btn").on('click', function(e) {
+            e.preventDefault();
+
+            let values = $('#comarca-select').val();
+
+            if (values.length > 0) {
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('ajax.welcome.recargarTaulaAmbComarques') }}",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        data: values,
+                    },
+                    success: function(response) {
+
+                        var table = $('#myTable').DataTable();
+                        table.clear();
+
+                        if (response && Array.isArray(response)) {
+                            table.rows.add(response.map(item => [
+                                item.codi,
+                                item.nom,
+                                item.comarca,
+                                item.provincia,
+                                `<div class="flex flex-row items-center justify-center" style="column-gap: 0.6rem;">
+                                        <div>
+                                            <button id="visualitzar-btn" onclick="visualitzarMunicipi(${item.id})">
+                                                <img src="{{ asset('build/assets/iconoVisualizar.png') }}" alt="Icono de editar" width="30" style="background-color:yellow; border-radius: 5px;">
+                                            </button>
+                                        </div>
+
+                                        <div>
+                                            <button id="editar-btn" onclick="editarMunicipi(${item.id})">
+                                                <img src="{{ asset('build/assets/iconoEditar.png') }}" alt="Icono de editar" width="30" style="background-color:blue; border-radius: 5px;">
+                                            </button>
+                                        </div>
+
+                                        <div>
+                                            <button id="eliminar-btn" onclick="eliminarMunicipi(${item.id})">
+                                                <img src="{{ asset('build/assets/iconoEliminar.png') }}" alt="Icono de editar" width="30" style="background-color:red; border-radius: 5px;">
+                                            </button>
+                                        </div>
+                                    </div>`,
+                            ])).draw();
+                        } else {
+                            console.log("Error: La respuesta no contiene datos válidos.");
+                        }
+                    },
+                })
+            } else if ($('#provincia-select').val() != "XXXX") {
+                var confirmError = $.confirm({
+                    title: "<span>Error al filtrar</span>",
+                    content: `<span>Per poder filtrar per comarca heu de seleccionar al menys una d'elles.</span>`,
+                    draggable: false,
+                    closeIcon: false,
+                    theme: 'supervan',
+                    buttons: {
+                        Tancar: {
+                            text: 'Tancar',
+                            btnClass: 'btn-red',
+                            action: function() {
+                                this.close();
+                            }
+                        }
+                    }
+                });
+            }
+        });
+
+
+        function visualitzarMunicipi(id) {
             $.ajax({
                 type: "POST",
-                url: "{{ route('ajax.main.obtenirById') }}",
+                url: "{{ route('ajax.welcome.obtenirById') }}",
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
@@ -251,21 +427,21 @@
                     id: id,
                 },
                 success: function(response) {
+                    console.log(response);
 
-                    let poble = response.poble; 
+                    let poble = response;
 
-                    let fotosArray = poble[0].foto.split("####");
+                    let fotosArray = poble.foto.split("####");
 
-                    
+
                     let imagenesHTML = fotosArray.map(url => {
                         if (url != "") {
-                        return 
-                        `<div style="flex: 1 0 45%; margin-bottom: 1rem; display: flex; justify-content: center;"> 
+                            return `<div style="flex: 1 0 45%; margin-bottom: 1rem; display: flex; justify-content: center;"> 
                         <img src="${url}" alt="Imagen del municipio" style="height: 500; border-radius: 10px; object-fit: cover; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                         </div>`;
                         }
                     }).join("");
-                    
+
 
                     let fichaVisualizar = `
 
@@ -275,10 +451,10 @@
                             <div id="fotoContainer" style="display: none; flex-wrap: wrap; gap: 2rem; font-family: Arial, sans-serif; padding: 2rem; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
 
                                 <div style="flex: 1; max-width: 100%; min-width: 250px; display: flex; flex-direction: column; align-items: center;">
-                                <strong style="font-size: 40px; color:rgb(1, 8, 186); font-weight: bold; text-align: center;">${poble[0].nom}</strong>
+                                <strong style="font-size: 40px; color:rgb(1, 8, 186); font-weight: bold; text-align: center;">${poble.nom}</strong>
                                 <br><br>
                                 <strong style="font-size: 20px; color: black; text-align: center;">Descripció:</strong>
-                                <p style="font-size: 16px; color: black; text-align: center; width: 100%;">${poble[0].descripcio}</p>
+                                <p style="font-size: 16px; color: black; text-align: center; width: 100%;">${poble.descripcio}</p>
                             </div>
 
                             <!-- Imágenes en columnas de 2 -->
@@ -314,12 +490,12 @@
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${poble[0].latitud}</td>
-                                        <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${poble[0].longitud}</td>
-                                        <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${parseFloat(poble[0].altitud)}</td>
+                                        <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${poble.latitud}</td>
+                                        <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${poble.longitud}</td>
+                                        <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${parseFloat(poble.altitud)}</td>
                                         <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">
-                                            ${parseFloat(poble[0].superficie).toFixed(2)}</td>
-                                        <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${poble[0].poblacio}</td>
+                                            ${parseFloat(poble.superficie).toFixed(2)}</td>
+                                        <td style="padding: 10px; text-align: left; border: 1px solid #ddd;">${poble.poblacio}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -333,8 +509,12 @@
                         closeIcon: false,
                         theme: 'supervan',
                         buttons: {
-                            Tanca: function() {
-                                visualizarConfirm.close();
+                            Tancar: {
+                                text: 'Tancar',
+                                btnClass: 'btn-red',
+                                action: function() {
+                                    this.close();
+                                }
                             }
                         }
                     });
@@ -352,127 +532,138 @@
                 }
             });
         }
+
         $("#crear-btn").click(function() {
             $.confirm({
-                title: 'Crear un nou Municipi',
+                title: 'Crear Municipi',
                 content: `
-                            <form id="crearForm" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 1rem; max-width: 800px; margin: auto; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                            <form id="crearForm" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 3rem; max-width: 800px; margin: auto; background-color: transparent; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="codi" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Codi municipi:</label>
-                                    <input type="number" id="codi" name="codi" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="codi" style="font-weight: bold; margin-bottom: 0.5rem; color: black;">Codi municipi:</label>
+                                    <input type="number" id="codi" name="codi" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="nom" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Nom:</label>
-                                    <input type="text" id="nom" name="nom" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="nom" style="font-weight: bold; color: #333; margin-bottom: 0.5rem; color: black;">Nom:</label>
+                                    <input type="text" id="nom" name="nom" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="codiComarca" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Codi comarca:</label>
-                                    <input type="number" id="codiComarca" name="codiComarca" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="codiComarca" style="font-weight: bold; color: #333; margin-bottom: 0.5rem; color: black;">Codi comarca:</label>
+                                    <input type="number" id="codiComarca" name="codiComarca" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="comarca" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Comarca:</label>
-                                    <input type="text" id="comarca" name="comarca" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="comarca" style="font-weight: bold; color: #333; margin-bottom: 0.5rem; color: black;">Comarca:</label>
+                                    <input type="text" id="comarca" name="comarca" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="provincia" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Provincia:</label>
-                                    <input type="text" id="provincia" name="provincia" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="provincia" style="font-weight: bold; color: #333; margin-bottom: 0.5rem; color: black;">Provincia:</label>
+                                    <input type="text" id="provincia" name="provincia" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="poblacio" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Población:</label>
-                                    <input type="number" id="poblacio" name="poblacio" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="poblacio" style="font-weight: bold; color: #333; margin-bottom: 0.5rem; color: black;">Población:</label>
+                                    <input type="number" id="poblacio" name="poblacio" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column; grid-column: span 2;">
-                                    <label for="descripcio" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Descripción:</label>
-                                    <textarea id="descripcio" name="descripcio" required style="width: 100%; height: 150px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;"></textarea>
+                                    <label for="descripcio" style="font-weight: bold; color: #333; margin-bottom: 0.5rem; color: black;">Descripción:</label>
+                                    <textarea id="descripcio" name="descripcio" required style="color: black; width: 100%; height: 150px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;"></textarea>
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="latitud" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Latitud:</label>
-                                    <input type="text" id="latitud" name="latitud" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="latitud" style="font-weight: bold; color: #333; margin-bottom: 0.5rem; color: black;">Latitud:</label>
+                                    <input type="text" id="latitud" name="latitud" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="longitud" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Longitud:</label>
-                                    <input type="text" id="longitud" name="longitud" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="longitud" style="font-weight: bold; color: #333; margin-bottom: 0.5rem; color: black;">Longitud:</label>
+                                    <input type="text" id="longitud" name="longitud" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="altitud" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Altitud:</label>
-                                    <input type="text" id="altitud" name="altitud" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="altitud" style="font-weight: bold; color: #333; margin-bottom: 0.5rem; color: black;">Altitud:</label>
+                                    <input type="text" id="altitud" name="altitud" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="superficie" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Superficie:</label>
-                                    <input type="text" id="superficie" name="superficie" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="superficie" style="font-weight: bold; color: #333; margin-bottom: 0.5rem; color: black;">Superficie:</label>
+                                    <input type="text" id="superficie" name="superficie" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
-                                <div style="display: flex; flex-direction: column;">
-                                    <label for="foto" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Foto URL:</label>
+                                <div style="display: flex; flex-direction: column; grid-column: span 2; align-items: center; text-align: center;">
+                                    <label for="foto" style="font-weight: bold; color: #333; margin-bottom: 0.5rem; color: black;">Foto URL:</label>
                                     <label for="foto" style="font-weight: bold; color: red; margin-bottom: 0.5rem;">(Si desitges afegir més d'una imatge, separa les adreces URL amb '####', https://exemple.com/imatge1.jpg####https://exemple.com/imatge2.jpg.)</label>
-                                    <input type="text" id="foto" name="foto" style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <input type="text" id="foto" name="foto" style="color: black; width: 80%; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                             </form>
             `,
                 type: 'green',
+                theme: 'supervan',
                 buttons: {
-                    Crear: function() {
+                    Crear: {
 
-                        let nom = $("#nom").val();
-                        let comarca = $("#comarca").val();
-                        let provincia = $("#provincia").val();
-                        let poblacio = $("#poblacio").val();
-                        let descripcio = $("#descripcio").val();
-                        let latitud = $("#latitud").val();
-                        let logintud = $("#logintud").val();
-                        let altitud = $("#altitud").val();
-                        let superficie = $("#superficie").val();
-                        let foto = $("#foto").val();
-                        let codi = $("#codi").val();
-                        let codiComarca = $("#codiComarca").val();
+                        text: 'Crear',
+                        btnClass: 'btn-green',
+                        action: function() {
 
-                        $.ajax({
-                            url: "{{ route('ajax.welcome.crear') }}",
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            data: {
-                                nom: nom,
-                                comarca: comarca,
-                                provincia: provincia,
-                                poblacio: poblacio,
-                                descripcio: descripcio,
-                                latitud: latitud,
-                                logintud: logintud,
-                                altitud: altitud,
-                                superficie: superficie,
-                                foto: foto,
-                                codi: codi,
-                                codiComarca: codiComarca,
-                                updated: 1
-                            },
-                            success: function(response) {
-                                if (response.success) {
+                            let nom = $("#nom").val();
+                            let comarca = $("#comarca").val();
+                            let provincia = $("#provincia").val();
+                            let poblacio = $("#poblacio").val();
+                            let descripcio = $("#descripcio").val();
+                            let latitud = $("#latitud").val();
+                            let longitud = $("#longitud").val();
+                            let altitud = $("#altitud").val();
+                            let superficie = $("#superficie").val();
+                            let foto = $("#foto").val();
+                            let codi = $("#codi").val();
+                            let codiComarca = $("#codiComarca").val();
+
+                            $.ajax({
+                                url: "{{ route('ajax.welcome.crear') }}",
+                                method: 'POST',
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: {
+                                    nom: nom,
+                                    comarca: comarca,
+                                    provincia: provincia,
+                                    poblacio: poblacio,
+                                    descripcio: descripcio,
+                                    latitud: latitud,
+                                    longitud: longitud,
+                                    altitud: altitud,
+                                    superficie: superficie,
+                                    foto: foto,
+                                    codi: codi,
+                                    codiComarca: codiComarca,
+                                    updated: 1
+                                },
+                                success: function(response) {
+                                    if (response.success) {
+                                        $.alert({
+                                            title: 'Èxit',
+                                            content: 'Poble creat amb èxit.',
+                                            type: 'green',
+                                        });
+                                        location.reload();
+                                    } else {
+                                        $.alert({
+                                            title: 'Error !',
+                                            content: 'Ha ocurregut un error en crear el poble.',
+                                            type: 'red',
+                                        });
+                                    }
+                                },
+                                error: function() {
                                     $.alert({
-                                        title: 'Èxit',
-                                        content: 'Poble creat amb èxit.',
-                                        type: 'green',
-                                    });
-                                    location.reload();
-                                } else {
-                                    $.alert({
-                                        title: 'Error',
-                                        content: 'Ha ocurregut un error en crear el poble.',
+                                        title: 'Error !',
+                                        content: 'Ha ocurregut un error a la solicitud.',
                                         type: 'red',
                                     });
                                 }
-                            },
-                            error: function() {
-                                $.alert({
-                                    title: 'Error',
-                                    content: 'Ha ocurregut un error a la solicitud.',
-                                    type: 'red',
-                                });
-                            }
-                        });
+                            });
+                        },
                     },
-                    Cancelar: function() {
-
+                    Tancar: {
+                        text: 'Tancar',
+                        btnClass: 'btn-red',
+                        action: function() {
+                            this.close();
+                        }
                     }
                 }
             });
@@ -490,55 +681,55 @@
                 },
                 success: function(response) {
                     let formularioEditar = `
-                        <form id="crearForm" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 1rem; max-width: 800px; margin: auto; background-color: #f9f9f9; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+                        <form id="crearForm" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 3rem; max-width: 800px; margin: auto; background-color: #transparent; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="codi" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Codi municipi:</label>
-                                    <input type="number" id="codi" name="codi" value="${response.codi}" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="codi" style="font-weight: bold; margin-bottom: 0.5rem; color: black;">Codi municipi:</label>
+                                    <input type="number" id="codi" name="codi" value="${response.codi}" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="nom" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Nom:</label>
-                                    <input type="text" id="nom" name="nom" value="${response.nom}" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="nom" style="font-weight: bold; margin-bottom: 0.5rem; color: black;">Nom:</label>
+                                    <input type="text" id="nom" name="nom" value="${response.nom}" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="codiComarca" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Codi comarca:</label>
-                                    <input type="number" id="codiComarca" name="codiComarca" value="${response.codiComarca}" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="codiComarca" style="font-weight: bold; margin-bottom: 0.5rem; color: black;">Codi comarca:</label>
+                                    <input type="number" id="codiComarca" name="codiComarca" value="${response.codiComarca}" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="comarca" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Comarca:</label>
-                                    <input type="text" id="comarca" name="comarca" value="${response.comarca}" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="comarca" style="font-weight: bold; margin-bottom: 0.5rem; color: black;">Comarca:</label>
+                                    <input type="text" id="comarca" name="comarca" value="${response.comarca}" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="provincia" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Provincia:</label>
-                                    <input type="text" id="provincia" name="provincia" value="${response.provincia}" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="provincia" style="font-weight: bold; color: black; margin-bottom: 0.5rem;">Provincia:</label>
+                                    <input type="text" id="provincia" name="provincia" value="${response.provincia}" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="poblacio" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Población:</label>
-                                    <input type="number" id="poblacio" name="poblacio" value="${response.poblacio}" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="poblacio" style="font-weight: bold; color: black; margin-bottom: 0.5rem;">Población:</label>
+                                    <input type="number" id="poblacio" name="poblacio" value="${response.poblacio}" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column; grid-column: span 2;">
-                                    <label for="descripcio" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Descripción:</label>
-                                    <textarea id="descripcio" name="descripcio" required style="width: 100%; height: 150px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">${response.descripcio}</textarea>
+                                    <label for="descripcio" style="font-weight: bold; color: black; margin-bottom: 0.5rem;">Descripción:</label>
+                                    <textarea id="descripcio" name="descripcio" required style="color: black; width: 100%; height: 150px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">${response.descripcio}</textarea>
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="latitud" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Latitud:</label>
-                                    <input type="text" id="latitud" name="latitud"  value="${response.latitud}" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="latitud" style="font-weight: bold; color: black; margin-bottom: 0.5rem;">Latitud:</label>
+                                    <input type="text" id="latitud" name="latitud"  value="${response.latitud}" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="longitud" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Longitud:</label>
-                                    <input type="text" id="longitud" name="longitud"  value="${response.longitud}" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="longitud" style="font-weight: bold; color: black; margin-bottom: 0.5rem;">Longitud:</label>
+                                    <input type="text" id="longitud" name="longitud"  value="${response.longitud}" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="altitud" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Altitud:</label>
-                                    <input type="text" id="altitud" name="altitud"  value="${response.altitud}" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="altitud" style="font-weight: bold; color: black; margin-bottom: 0.5rem;">Altitud:</label>
+                                    <input type="text" id="altitud" name="altitud"  value="${response.altitud}" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                                 <div style="display: flex; flex-direction: column;">
-                                    <label for="superficie" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Superficie:</label>
-                                    <input type="text" id="superficie" name="superficie"  value="${response.superficie}" required style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <label for="superficie" style="font-weight: bold; color: black; margin-bottom: 0.5rem;">Superficie:</label>
+                                    <input type="text" id="superficie" name="superficie"  value="${response.superficie}" required style="color: black; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
-                                <div style="display: flex; flex-direction: column;">
-                                    <label for="foto" style="font-weight: bold; color: #333; margin-bottom: 0.5rem;">Foto URL:</label>
+                                <div style="display: flex; flex-direction: column; grid-column: span 2; align-items: center; text-align: center;">
+                                    <label for="foto" style="font-weight: bold; color: black; margin-bottom: 0.5rem;">Foto URL:</label>
                                     <label for="foto" style="font-weight: bold; color: red; margin-bottom: 0.5rem;">(Si desitges afegir més d'una imatge, separa les adreces URL amb '####', https://exemple.com/imatge1.jpg####https://exemple.com/imatge2.jpg.)</label>
-                                    <input type="text" id="foto" name="foto"  value="${response.foto}" style="padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
+                                    <input type="text" id="foto" name="foto" value="${response.foto}" style="color: black; width: 80%; padding: 0.8rem; border-radius: 5px; border: 1px solid #ccc; font-size: 14px; transition: border-color 0.3s;">
                                 </div>
                         </form>
             `;
@@ -546,11 +737,9 @@
                         title: "Editar Municipi",
                         content: formularioEditar,
                         draggable: false,
+                        theme: 'supervan',
                         closeIcon: false,
                         buttons: {
-                            Tanca: function() {
-                                this.close();
-                            },
                             Enviar: {
                                 btnClass: 'btn-green',
                                 action: function() {
@@ -591,18 +780,39 @@
                                             codiComarca: codiComarca
                                         },
                                         success: function(response) {
-
                                             if (response.success) {
+                                                $.alert({
+                                                    title: 'Èxit',
+                                                    content: 'Poble actualizat amb èxit.',
+                                                    type: 'green',
+                                                });
                                                 self.close();
                                                 location.reload();
                                             } else {
-                                                console.error("Error al guardar el municipio.");
+                                                $.alert({
+                                                    title: 'Error',
+                                                    content: 'Poble no actualizat.',
+                                                    type: 'red',
+                                                });
+                                                console.error("Error al guardar el municipi.");
                                             }
                                         },
                                         error: function() {
-                                            console.error("Error en el servidor.");
+                                            $.alert({
+                                                title: 'Error !',
+                                                content: 'Poble no actualizat.',
+                                                type: 'red',
+                                            });
+                                            console.error("Error al servidor.");
                                         }
                                     });
+                                }
+                            },
+                            Tancar: {
+                                text: 'Tancar',
+                                btnClass: 'btn-red',
+                                action: function() {
+                                    this.close();
                                 }
                             }
                         },
@@ -613,7 +823,7 @@
 
                 },
                 error: function() {
-                    console.error("Error al obtener los datos del municipio.");
+                    console.error("Error al obtenir les dades del municpi.");
                 }
             });
         }
@@ -621,7 +831,7 @@
         function eliminarMunicipi(id) {
             $.confirm({
                 title: 'Eliminar Municipi',
-                content: '¿Estàs segur que vols eliminar aquest poble?',
+                content: '¿Estàs segur que vols eliminar el municipi?',
                 type: 'red',
                 buttons: {
                     Confirmar: function() {

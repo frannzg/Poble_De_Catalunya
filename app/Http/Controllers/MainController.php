@@ -10,24 +10,82 @@ class MainController extends Controller
 {
     public function index()
     {
+        
 
         $pobles = DB::table('pobles')->get()->toArray();
 
-        return view("main", compact("pobles"));
+        $provinciaTotal = DB::table('pobles')
+            ->select('provincia', DB::raw('COUNT(*) as total'))
+            ->groupBy('provincia')
+            ->get();
+
+        $comarcatotal = DB::table('pobles')
+            ->select('comarca', DB::raw('COUNT(*) as total'))
+            ->groupBy('comarca')
+            ->get();
+        return view("main", compact("pobles", "provinciaTotal", "comarcatotal"));
     }
 
-    public function obtenirById(Request $request)
+    //Obtenir dades dels filtres
+    public function obtenirDadesFiltres(Request $request)
     {
-        $id = $request->input('id');
-        $poble = Poble::find($id);
+        $query = DB::table('pobles');
 
-        if (!$poble) {
-            return response()->json(['message' => 'Poble no encontrado'], 404);
+        if ($request->has('provincia') && $request->provincia != '') {
+            $query->where('provincia', $request->provincia);
         }
 
-        // Envolver en un array para que el frontend pueda manejarlo como 'poble[0]'
+        if ($request->has('comarca') && $request->comarca != '') {
+            $query->where('comarca', $request->comarca);
+        }
+
+        $data = $query->paginate(20);
+
+        return response()->json($data);
+    }
+
+    // Recarregar el selector de comarques
+    public function recarregaSelectComarques(Request $request)
+    {
+        if ($request->data != "XXXX") {
+            $datos = DB::table('pobles')
+            ->select('comarca', 'codiComarca')
+            ->where('provincia', $request->data)
+            ->get()
+            ->toArray();
+        } 
+
+        return response()->json($datos, 200);
+    }
+
+    // Recarregar la taula amb el filtre de comarques
+    public function recargarTaulaAmbComarques(Request $request){
+        $datos = DB::table('pobles')->select('*')->whereIn('codiComarca', $request->data)->get()->toArray();
+        
+        return response()->json($datos, 200);
+    }
+
+    public function obtenirById(Request $request){
+        $id = $request->input('id');
+        $poble = Poble::select('*')->where('id', $id)->first();
+
+        if (!$poble) {
+            return response()->json(['message' => 'Poble no trobat'], 404);
+        }
+
         return response()->json([
-            'poble' => [$poble]
-        ]);
+            'nom' => $poble->nom,
+            'comarca' => $poble->comarca,
+            'provincia' => $poble->provincia,
+            'descripcio' => $poble->descripcio,
+            'foto' => $poble->foto,
+            'latitud' => $poble->latitud,
+            'longitud' => $poble->longitud,
+            'altitud' => $poble->altitud,
+            'superficie' => $poble->superficie,
+            'poblacio' => $poble->poblacio,
+            'codi' => $poble->codi,
+            'codiComarca' => $poble->codiComarca
+        ], 200);
     }
 }
