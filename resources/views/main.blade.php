@@ -24,19 +24,16 @@
             transition: all 0.3s ease;
         }
 
-        /* Hover para botones */
         button:hover {
             transform: scale(1.05);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
 
-        /* Activo (clic) en botones */
         button:active {
             transform: scale(0.95);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        /* Estilo para botones con imágenes */
         button img {
             transition: transform 0.3s ease;
         }
@@ -49,26 +46,17 @@
             transform: rotate(-10deg) scale(0.95);
         }
 
-        /* Cambios al pasar el mouse */
         a:hover {
             background-color: lightgray;
-            /* Cambia el fondo */
             color: black;
-            /* Cambia el color del texto */
             transform: scale(1.05);
-            /* Aumenta el tamaño ligeramente */
             transition: all 0.3s ease;
-            /* Transición suave */
         }
 
-        /* Cambios al hacer clic */
         a:active {
             background-color: gray;
-            /* Fondo más oscuro al hacer clic */
             transform: scale(0.95);
-            /* Reduce el tamaño ligeramente */
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            /* Agrega un efecto de sombra */
         }
 
         /* *** FIN ESTILS BOTONS *** */
@@ -86,7 +74,6 @@
             justify-self: center;
         }
 
-        /* From Uiverse.io by Donewenfu */
         .loader {
             position: absolute;
             top: 0;
@@ -176,7 +163,7 @@
     </style>
 
     <body>
-        <!-- Menú superior -->
+        <!-- Menu superior -->
         <header class="bg-white border-b border-gray-200">
             <div class="container mx-auto flex justify-between items-center p-4">
                 <div class="text-xl font-bold"></div>
@@ -272,10 +259,10 @@
     <script>
         $(document).ready(function() {
             $('#myTable').DataTable({
-                "paging": true, // Paginación
-                "searching": true, // Buscar
-                "ordering": true, // Ordenar
-                "info": false, // Información de la tabla
+                "paging": true, 
+                "searching": true, 
+                "ordering": false, 
+                "info": false,
                 "responsive": true,
                 "language": {
                     "decimal": "",
@@ -333,7 +320,7 @@
                         console.log(optionsSelectComarca);
                     },
                     error: function(error) {
-                        console.log("Error al obtener el municipio:", error);
+                        console.log("Error al obtenir el municipi:", error);
                     }
                 })
                 $('#comarca-container').css('display', 'block');

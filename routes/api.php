@@ -9,6 +9,7 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+// Rutes per consumir la API un en local i l'altra per wikipedia commons
 Route::get('/obtenirPobles', [PobleController::class, 'obtenirPobles']);
 Route::get('/afegirDadesRestants', [PobleController::class, 'afegirDadesRestants']);
 

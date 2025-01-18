@@ -8,6 +8,7 @@ use App\Models\Poble;
 
 class MainController extends Controller
 {
+    //Obtenir totes les dades del poble
     public function index()
     {
         

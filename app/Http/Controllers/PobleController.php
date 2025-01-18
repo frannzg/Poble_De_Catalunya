@@ -194,7 +194,6 @@ class PobleController extends Controller
                     } else if ($imagenPageId == "") {
                         $imagenes = "";
                     }
-                    // usleep(200000);
                 }
             }
 
